@@ -35,12 +35,8 @@ struct Dht {
 }
 
 impl Dht {
-    fn put(&self, put_struct: &DhtPut) {}
-    fn get(
-        &self,
-        get_struct: &DhtGet,
-        response_socket: &mut TcpStream,
-    ) -> Result<(), Box<dyn Error>> {
+    fn put(&self, key: &Vec<u8>, value: &Vec<u8>) {}
+    fn get(&self, key: &Vec<u8>, response_socket: &mut TcpStream) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 }
@@ -116,14 +112,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                     } else if size > 0 {
                                         p.value.push(*byte);
                                     } else {
-                                        dht.put(p);
+                                        dht.put(&p.key, &p.value);
                                     }
                                 }
                                 Some(Message::Get(g)) => {
                                     if g.key.len() < 32 {
                                         g.key.push(*byte);
                                     } else {
-                                        dht.get(g, &mut socket)?;
+                                        dht.get(&g.key, &mut socket)?;
                                     }
                                 }
                                 _ => {
