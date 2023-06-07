@@ -12,6 +12,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         tokio::spawn(async move {
             let mut connection_result = async move || -> Result<(), Box<dyn Error>> {
                 // In a loop, read data from the socket
+                let mut buf = [0; 1024];
                 loop {
                     let n = match socket.read(&mut buf).await {
                         // socket closed
@@ -21,7 +22,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     };
                 }
             };
-            if let Err(e) = connection_result.await {
+            if let Err(e) = connection_result().await {
                 println!("Error on connection: {}", e)
             }
         });
