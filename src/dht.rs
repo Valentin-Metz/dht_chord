@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use dashmap::DashMap;
+use num_traits::Bounded;
 use serde::Serialize;
 use tokio::net::TcpListener;
 
@@ -55,5 +56,5 @@ impl<K: SChordKey, V: SChordValue> SChord<K, V> {
     }
 }
 
-pub trait SChordKey: Serialize + Eq + Hash + Send + Sync + 'static {}
+pub trait SChordKey: Serialize + Eq + Hash + Bounded + Send + Sync + 'static {}
 pub trait SChordValue: Serialize + Send + Sync + 'static {}
