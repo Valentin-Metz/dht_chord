@@ -5,6 +5,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::sync::Arc;
 use std::time::Duration;
 
+use dashmap::mapref::one::Ref;
 use dashmap::DashMap;
 use num_traits::Bounded;
 use parking_lot::RwLock;
@@ -14,21 +15,21 @@ use tokio::task::JoinHandle;
 
 use crate::s_chord::peer_messages::PeerMessage;
 
-pub struct SChord<K: SChordKey, V: SChordValue> {
-    state: Arc<SChordState<K, V>>,
+pub struct SChord {
+    state: Arc<SChordState>,
 }
 
-struct SChordState<K: SChordKey, V: SChordValue> {
+struct SChordState {
     default_store_duration: Duration,
     max_store_duration: Duration,
 
     node_id: u64,
     finger_table: Vec<RwLock<(u64, SocketAddr)>>,
 
-    local_storage: DashMap<K, V>,
+    local_storage: DashMap<u64, Vec<u8>>,
 }
 
-impl<K: SChordKey, V: SChordValue> SChord<K, V> {
+impl SChord {
     pub fn start_server_socket(&self, server_address: SocketAddr) -> JoinHandle<()> {
         let self_clone = SChord {
             state: self.state.clone(),
@@ -89,13 +90,13 @@ impl<K: SChordKey, V: SChordValue> SChord<K, V> {
         }
     }
 
-    pub async fn insert(&self, key: K, value: V) {
+    pub async fn insert(&self, key: u64, value: Vec<u8>) {
         self.insert_with_ttl(key, value, self.state.default_store_duration)
             .await;
     }
-    pub async fn insert_with_ttl(&self, key: K, value: V, ttl: Duration) {}
+    pub async fn insert_with_ttl(&self, key: u64, value: Vec<u8>, ttl: Duration) {}
 
-    pub async fn get(&self, key: &K) -> Option<&V> {
+    pub async fn get(&self, key: u64) -> Option<&Vec<u8>> {
         None
     }
 
@@ -128,6 +129,15 @@ impl<K: SChordKey, V: SChordValue> SChord<K, V> {
                     .await?;
                     todo!("Check if we own key");
                 }
+                PeerMessage::GetValue(key) => match self.state.local_storage.get(&key) {
+                    Some(value) => {
+                        tx.send(PeerMessage::GetValueResponse(Some(value.value().clone())))
+                            .await?;
+                    }
+                    None => {
+                        tx.send(PeerMessage::GetValueResponse(None)).await?;
+                    }
+                },
                 _ => {
                     panic!("Unexpected message type");
                 }
@@ -135,9 +145,3 @@ impl<K: SChordKey, V: SChordValue> SChord<K, V> {
         }
     }
 }
-
-pub trait SChordKey: Serialize + Eq + Hash + Bounded + Send + Sync + 'static {}
-pub trait SChordValue: Serialize + Send + Sync + 'static {}
-
-impl SChordKey for u64 {}
-impl SChordValue for Vec<u8> {}
