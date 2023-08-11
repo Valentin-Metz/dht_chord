@@ -96,8 +96,11 @@ impl SChord {
     }
     pub async fn insert_with_ttl(&self, key: u64, value: Vec<u8>, ttl: Duration) {}
 
-    pub async fn get(&self, key: u64) -> Option<&Vec<u8>> {
-        None
+    pub async fn get(&self, key: u64) -> Option<Vec<u8>> {
+        self.state
+            .local_storage
+            .get(&key)
+            .map(|entry| entry.value().clone())
     }
 
     /// Handle incoming requests from peers
@@ -116,7 +119,7 @@ impl SChord {
                     let entry = diff.leading_zeros();
                     let finger_table_index = usize::try_from(entry).unwrap();
 
-                    let response_node_key = self.state.finger_table[finger_table_index].read().0;
+                    let response_node_key = self.state.finger_table[finger_table_index].read().0; // todo: we should probably only lock once
                     let response_node_address =
                         self.state.finger_table[finger_table_index].read().1.ip();
                     let response_node_port =
@@ -129,15 +132,15 @@ impl SChord {
                     .await?;
                     todo!("Check if we own key");
                 }
-                PeerMessage::GetValue(key) => match self.state.local_storage.get(&key) {
-                    Some(value) => {
-                        tx.send(PeerMessage::GetValueResponse(Some(value.value().clone())))
-                            .await?;
-                    }
-                    None => {
-                        tx.send(PeerMessage::GetValueResponse(None)).await?;
-                    }
-                },
+                PeerMessage::GetValue(key) => {
+                    tx.send(PeerMessage::GetValueResponse(
+                        self.state
+                            .local_storage
+                            .get(&key)
+                            .map(|entry| entry.value().clone()),
+                    ))
+                    .await?;
+                }
                 _ => {
                     panic!("Unexpected message type");
                 }
