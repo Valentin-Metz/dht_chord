@@ -272,11 +272,7 @@ impl SChord {
 
     fn is_responsible_for_key(&self, key: u64) -> bool {
         if let Some(predecessor) = self.state.predecessors.read().first() {
-            let self_id = self.state.node_id;
-
-            let range_length = self_id.wrapping_sub(predecessor.id);
-            let wrapped_distance = key.wrapping_sub(predecessor.id);
-            wrapped_distance < range_length && wrapped_distance > 0
+            is_between_on_ring(key, predecessor.id, self.state.node_id)
         } else {
             true
         }
