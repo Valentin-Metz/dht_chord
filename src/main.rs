@@ -47,8 +47,8 @@ enum ApiPacketMessage {
 #[derive(Serialize, Deserialize, Debug)]
 struct DhtPut {
     ttl: u16,
-    _replication: u8,
-    _reserved: u8,
+    replication: u8,
+    reserved: u8,
     key: [u8; 32],
     value: Vec<u8>,
 }

@@ -15,7 +15,7 @@ use crate::s_chord::peer_messages::{ChordPeer, PeerMessage};
 
 macro_rules! connect_to_peer {
     ($address:expr) => {{
-        let mut stream = TcpStream::connect($address).await?;
+        let stream = TcpStream::connect($address).await?;
         let (reader, writer) = stream.into_split();
         channels::channel(reader, writer)
     }};
