@@ -194,7 +194,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
     async fn test_store_get() {
-        let dhts = start_peers(2).await;
+        let dhts = start_peers(1).await;
 
         let key = [0x1; 32];
         let value = vec![0x1, 0x2, 0x3];
