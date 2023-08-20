@@ -344,9 +344,15 @@ mod tests {
         for (dht, _) in dhts {
             println!("{}", dht.api_address);
             dht.dht.print_short();
+            println!("Stored values:");
             for (key, value) in dht.dht.state.local_storage.clone() {
                 println!("  {:x}: {:?}", key, value);
             }
+            println!("Finger table:");
+            for entry in &dht.dht.state.finger_table {
+                println!("{:?}", entry);
+            }
+            println!("---");
         }
     }
 }

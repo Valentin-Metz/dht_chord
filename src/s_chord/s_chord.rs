@@ -31,7 +31,7 @@ pub struct SChordState {
 
     node_id: u64,
     address: SocketAddr,
-    finger_table: Vec<RwLock<ChordPeer>>,
+    pub finger_table: Vec<RwLock<ChordPeer>>,
     predecessors: RwLock<Vec<ChordPeer>>,
 
     pub local_storage: DashMap<u64, Vec<u8>>,
