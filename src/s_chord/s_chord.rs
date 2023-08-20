@@ -11,7 +11,6 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc;
 use tokio::task::JoinHandle;
 
-use crate::s_chord::peer_messages::PeerMessage::GetValueResponse;
 use crate::s_chord::peer_messages::{ChordPeer, PeerMessage, SplitResponse};
 
 macro_rules! connect_to_peer {
@@ -340,7 +339,7 @@ impl SChord {
                         .local_storage
                         .get(&key)
                         .map(|entry| entry.value().clone());
-                    tx.send(GetValueResponse(value)).await?;
+                    tx.send(PeerMessage::GetValueResponse(value)).await?;
                 }
                 PeerMessage::GetPredecessor => {
                     let predecessor = self.get_predecessor();
