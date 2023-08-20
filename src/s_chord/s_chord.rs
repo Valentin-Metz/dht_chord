@@ -243,7 +243,7 @@ impl SChord {
                 .get(&key)
                 .map(|entry| entry.value().clone())
                 .ok_or(anyhow!(
-                    "Key {} found locally on node {}",
+                    "Key {} not found locally on node {}",
                     key,
                     self.state.address
                 ))
