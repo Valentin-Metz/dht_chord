@@ -165,6 +165,8 @@ mod tests {
         assert_eq!(header.size as usize, buf.len());
         stream.write_all(&buf).await.unwrap();
 
+        tokio::time::sleep(Duration::from_millis(50)).await;
+
         // Send Get Key Request
         info!("Sending get");
         let header = ApiPacketHeader {
