@@ -51,16 +51,19 @@ pub const API_DHT_FAILURE: u16 = 653;
 /// The corresponding packet consists only of a message-header, with the message-type set to `654`.
 pub const API_DHT_SHUTDOWN: u16 = 654;
 
+/// Internal representation of packages received on the API socket
 pub struct ApiPacket {
     header: ApiPacketHeader,
     message: ApiPacketMessage,
 }
+/// Header of an [`ApiPacket`]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiPacketHeader {
     pub(crate) size: u16,
     pub(crate) message_type: u16,
 }
 
+/// Parsed content of an [`ApiPacket`]
 pub enum ApiPacketMessage {
     Put(DhtPut),
     Get(DhtGet),
@@ -69,6 +72,7 @@ pub enum ApiPacketMessage {
 }
 
 #[derive(Debug)]
+/// Internal representation of a `DHT_PUT` request
 pub struct DhtPut {
     pub(crate) ttl: u16,
     pub(crate) replication: u8,
@@ -77,17 +81,20 @@ pub struct DhtPut {
     pub(crate) value: Vec<u8>,
 }
 
+/// Internal representation of a `DHT_GET` request
 #[derive(Deserialize, Debug)]
 pub struct DhtGet {
     key: [u8; 32],
 }
 
+/// Internal representation of a `DHT_SUCCESS` response
 #[derive(Debug)]
-pub struct DhtGetResponse {
+pub struct DhtGetSuccess {
     key: [u8; 32],
     value: Vec<u8>,
 }
 
+/// Internal representation of a `DHT_FAILURE` response
 #[derive(Serialize, Debug)]
 pub struct DhtGetFailure {
     key: [u8; 32],
