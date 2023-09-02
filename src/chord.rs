@@ -1,4 +1,4 @@
-//! Provides a black box implementation of a distributed hash table
+//! Black box implementation of a distributed hash table
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
