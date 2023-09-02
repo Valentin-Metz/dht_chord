@@ -10,11 +10,11 @@
 //! - IPv4 and IPv6 support
 //! - Automatic node discovery
 //! - Stabilization if nodes leave or join
-//! - Housekeeping thread to remove expired entries
+//! - Housekeeping thread to remove expired entries and refresh
 //! - Completely asynchronous and multi-threaded
 //! - Requests from the API and from other nodes are processed and answered concurrently
 //! - Free of race conditions due to Rusts ownership model
-//! - Performance optimized implementation, capable of running more than 20.000 nodes on a single machine
+//! - Performance optimized implementation, capable of running more than 20.000 nodes on a single machine //todo: measure
 //!
 //! # Security measures:
 //! - [SHA-3-512](https://docs.rs/sha3/0.10.8/sha3/) proof of work challenges with adjustable difficulty for requests
@@ -29,6 +29,8 @@
 //!     - In case of IPv6, we could only hash a masked version of the IP
 //!     - We have currently not implemented these,
 //!     as it would interfere with development and testing
+//! - Limited defence against nodes refusing to store values or disconnecting
+//!     - Our housekeeping thread continuously refreshes values that have been stored in the DHT upon our own request
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
