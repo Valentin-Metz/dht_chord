@@ -5,9 +5,10 @@
 //!
 //! # Features:
 //! - Key-Value storage
-//! - Distributed, if more than one node available
-//! - Automatic node discovery
+//! - Distributed, if more than one node available (but fully functional with one node only)
+//! - Built-in replication
 //! - IPv4 and IPv6 support
+//! - Automatic node discovery
 //! - Stabilization if nodes leave or join
 //! - Housekeeping thread to remove expired entries
 //! - Completely asynchronous and multi-threaded
