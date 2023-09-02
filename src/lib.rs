@@ -30,6 +30,14 @@
 //! ```bash
 //! p2p_dht -c /path_to/config.ini
 //! ```
+//! We support different levels of logging, with the default being `info`.
+//! You can change the log level by setting the `RUST_LOG` environment variable to one of the following values:
+//! - `error`
+//! - `warn`
+//! - `info`
+//! - `debug`
+//! - `trace`
+//!
 //! The latest `x86_64-unknown-linux-gnu` binary of our program is provided as an artifact on our [GitLab repository](https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/jobs/artifacts/master/file/target/release/p2p_dht?job=build).
 //!
 //! Alternatively, you may choose to build our program yourself:
@@ -44,7 +52,7 @@
 //! ```bash
 //! cargo doc --document-private-items
 //! ```
-//! You can then find the documentation in `target/doc/p2p_dht/index.html`.
+//! The documentation will be created in `target/doc/p2p_dht/index.html`.
 //! ## Testing:
 //! We provide a CI/CD pipeline that runs our tests on every commit.
 //! You may find the latest results [here](https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/pipelines/latest).
