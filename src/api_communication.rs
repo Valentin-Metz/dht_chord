@@ -46,12 +46,15 @@ pub const API_DHT_SUCCESS: u16 = 652;
 /// Answer to a failed [`API_DHT_GET`] request
 pub const API_DHT_FAILURE: u16 = 653;
 
-/// Requests the DHT to shutdown
+/// Requests our DHT node to shutdown
 ///
 /// The corresponding packet consists only of a message-header, with the message-type set to `654`.
 pub const API_DHT_SHUTDOWN: u16 = 654;
 
-/// Internal representation of packages received on the API socket
+/// Internal representation of all packages received on the API socket
+///
+/// After 4 header bytes are received and parsed into an [`ApiPacketHeader`],
+/// the rest of the message is parsed into the corresponding [`ApiPacketMessage`].
 pub struct ApiPacket {
     header: ApiPacketHeader,
     message: ApiPacketMessage,
@@ -59,7 +62,9 @@ pub struct ApiPacket {
 /// Header of an [`ApiPacket`]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiPacketHeader {
+    /// The size indicates the total length of a message, *including* the header
     pub(crate) size: u16,
+    /// Indicates the type of the message with a well-known constant
     pub(crate) message_type: u16,
 }
 
