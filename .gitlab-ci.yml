@@ -19,5 +19,5 @@ documentation:
     - cargo doc --document-private-items
   artifacts:
     paths:
-      - target/doc
+      - target/doc/p2p_dht
     expire_in: 1 week
