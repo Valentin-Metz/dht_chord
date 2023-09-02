@@ -20,7 +20,6 @@ use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
 
-use bincode::config::{BigEndian, FixintEncoding, WithOtherEndian, WithOtherIntEncoding};
 use bincode::{DefaultOptions, Options};
 use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
@@ -105,12 +104,6 @@ pub struct DhtGetFailure {
     key: [u8; 32],
 }
 
-pub(crate) fn with_big_endian(
-) -> WithOtherEndian<WithOtherIntEncoding<DefaultOptions, FixintEncoding>, BigEndian> {
-    DefaultOptions::new()
-        .with_fixint_encoding()
-        .with_big_endian()
-}
 impl ApiPacket {
     fn default() -> Self {
         ApiPacket {
@@ -152,7 +145,12 @@ impl ApiPacket {
                                 format!["DHT GET invalid size: {}", self.header.size].into()
                             );
                         }
-                        self.message = ApiPacketMessage::Get(with_big_endian().deserialize(v)?);
+                        self.message = ApiPacketMessage::Get(
+                            DefaultOptions::new()
+                                .with_fixint_encoding()
+                                .with_big_endian()
+                                .deserialize(v)?,
+                        );
                     }
                     API_DHT_SHUTDOWN => {
                         if self.header.size != 4 {
@@ -202,7 +200,11 @@ async fn process_api_get_request(
                 size: 4 + get.key.len() as u16 + value.len() as u16,
                 message_type: API_DHT_SUCCESS,
             };
-            let mut buf = with_big_endian().serialize(&header).unwrap();
+            let mut buf = DefaultOptions::new()
+                .with_fixint_encoding()
+                .with_big_endian()
+                .serialize(&header)
+                .unwrap();
             buf.extend(get.key);
             buf.extend(value);
 
@@ -218,7 +220,11 @@ async fn process_api_get_request(
                 size: 4 + get.key.len() as u16,
                 message_type: API_DHT_FAILURE,
             };
-            let mut buf = with_big_endian().serialize(&header).unwrap();
+            let mut buf = DefaultOptions::new()
+                .with_fixint_encoding()
+                .with_big_endian()
+                .serialize(&header)
+                .unwrap();
             buf.extend(get.key);
 
             if let Err(e) = response_stream.lock().await.write_all(&buf).await {
@@ -277,7 +283,7 @@ pub(crate) async fn start_api_server(
                                         header_bytes.push(*byte);
                                         if header_bytes.len() == 4 {
                                             if let Ok(header_success) =
-                                                with_big_endian().deserialize(&header_bytes)
+                                                DefaultOptions::new().with_fixint_encoding().with_big_endian().deserialize(&header_bytes)
                                             {
                                                 debug!("Deserialized header: {:?}", header_success);
                                                 packet.header = header_success;
