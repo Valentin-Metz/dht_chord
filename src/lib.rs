@@ -39,6 +39,12 @@
 //! cargo build --release
 //! ```
 //! This will create a binary in `target/release/p2p_dht`.
+//!
+//! You can also build this documentation locally:
+//! ```bash
+//! cargo doc --document-private-items
+//! ```
+//! You can then find the documentation in `target/doc/p2p_dht/index.html`.
 //! ## Testing:
 //! We provide a CI/CD pipeline that runs our tests on every commit.
 //! You may find the latest results [here](https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/pipelines/latest).
