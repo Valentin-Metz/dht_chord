@@ -1,4 +1,7 @@
-image: rust:latest
+default:
+  image: rust:latest
+  tags:
+    - rust
 
 build:
   script:
