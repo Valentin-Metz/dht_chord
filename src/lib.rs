@@ -11,7 +11,7 @@
 //! - `cargo 1.74.0-nightly (96fe1c9e1 2023-08-29)`
 //! - `rustc 1.74.0-nightly (35e416303 2023-09-01)`
 //!
-//! This documentation was built with:
+//! [This documentation](https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/jobs/artifacts/master/file/target/doc/p2p_dht/index.html?job=documentation) was built with:
 //! - `rustdoc 1.74.0-nightly (35e416303 2023-09-01)`
 //!
 //! # Main executable:
