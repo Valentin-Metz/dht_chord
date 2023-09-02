@@ -239,7 +239,7 @@ mod tests {
         .await;
 
         // Get
-        let hashed_key = api_communication::hash_vec_bytes(&key);
+        let hashed_key = api_communication::hash_key_bytes(&key);
         let value_back = dht.dht.get(hashed_key).await.unwrap();
 
         assert_eq!(value_back, value);
@@ -441,7 +441,7 @@ mod tests {
     async fn check_all_keys(dhts: &Vec<P2pDht>, original_pairs: Vec<([u8; 32], Vec<u8>)>) {
         for (key, value) in original_pairs {
             // Get
-            let hashed_key = api_communication::hash_vec_bytes(&key);
+            let hashed_key = api_communication::hash_key_bytes(&key);
 
             for dht in dhts {
                 match dht.dht.get(hashed_key).await {

@@ -174,13 +174,13 @@ impl ApiPacket {
     }
 }
 
-pub(crate) fn hash_vec_bytes(vec_bytes: &[u8]) -> u64 {
+pub(crate) fn hash_key_bytes(vec_bytes: &[u8]) -> u64 {
     let mut hasher = DefaultHasher::new();
     vec_bytes.hash(&mut hasher);
     hasher.finish()
 }
 pub(crate) async fn process_api_put_request(dht: SChord, put: DhtPut) {
-    let hashed_key = hash_vec_bytes(&put.key);
+    let hashed_key = hash_key_bytes(&put.key);
     if let Err(e) = dht
         .insert(hashed_key, put.value, Duration::from_secs(put.ttl as u64))
         .await
@@ -193,7 +193,7 @@ async fn process_api_get_request(
     get: &DhtGet,
     response_stream: &Arc<Mutex<OwnedWriteHalf>>,
 ) {
-    let hashed_key = hash_vec_bytes(&get.key);
+    let hashed_key = hash_key_bytes(&get.key);
     match dht.get(hashed_key).await {
         Ok(value) => {
             let header = ApiPacketHeader {
