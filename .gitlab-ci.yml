@@ -11,7 +11,6 @@ build:
 test:
   script:
     - cargo --version && rustc --version
-    - cargo test
     - cargo test --release
 
 documentation:
