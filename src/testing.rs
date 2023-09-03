@@ -127,7 +127,7 @@ mod tests {
             message_type: api_communication::API_DHT_PUT,
         };
         let payload = api_communication::DhtPut {
-            ttl: 600,
+            ttl: 3600,
             replication: 4,
             _reserved: 0,
             key,
@@ -229,7 +229,7 @@ mod tests {
         api_communication::process_api_put_request(
             dht.dht.clone(),
             api_communication::DhtPut {
-                ttl: 600,
+                ttl: 3600,
                 replication: 4,
                 _reserved: 0,
                 key,
@@ -284,7 +284,7 @@ mod tests {
             api_communication::process_api_put_request(
                 dht0.dht.clone(),
                 api_communication::DhtPut {
-                    ttl: 600,
+                    ttl: 3600,
                     replication: 4,
                     _reserved: 0,
                     key: *key,
@@ -299,7 +299,7 @@ mod tests {
             api_communication::process_api_put_request(
                 dht1.dht.clone(),
                 api_communication::DhtPut {
-                    ttl: 600,
+                    ttl: 3600,
                     replication: 4,
                     _reserved: 0,
                     key: *key,
@@ -338,7 +338,7 @@ mod tests {
                 api_communication::process_api_put_request(
                     dhts[i].dht.clone(),
                     api_communication::DhtPut {
-                        ttl: 600,
+                        ttl: 3600,
                         replication: 4,
                         _reserved: 0,
                         key: *key,
@@ -388,7 +388,7 @@ mod tests {
                 api_communication::process_api_put_request(
                     dhts[i].dht.clone(),
                     api_communication::DhtPut {
-                        ttl: 600,
+                        ttl: 3600,
                         replication: 4,
                         _reserved: 0,
                         key: *key,
