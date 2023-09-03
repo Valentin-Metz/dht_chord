@@ -31,6 +31,7 @@
 //!     as it would interfere with development and testing
 //! - Limited defence against nodes refusing to store values or disconnecting
 //!     - Our housekeeping thread continuously refreshes values that have been stored in the DHT upon our own request
+//! # Security evaluation:
 
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
