@@ -229,8 +229,8 @@ mod tests {
         api_communication::process_api_put_request(
             dht.dht.clone(),
             api_communication::DhtPut {
-                ttl: 0,
-                replication: 0,
+                ttl: 600,
+                replication: 4,
                 _reserved: 0,
                 key,
                 value: value.clone(),
@@ -299,8 +299,8 @@ mod tests {
             api_communication::process_api_put_request(
                 dht1.dht.clone(),
                 api_communication::DhtPut {
-                    ttl: 0,
-                    replication: 0,
+                    ttl: 600,
+                    replication: 4,
                     _reserved: 0,
                     key: *key,
                     value: value.clone(),
@@ -338,8 +338,8 @@ mod tests {
                 api_communication::process_api_put_request(
                     dhts[i].dht.clone(),
                     api_communication::DhtPut {
-                        ttl: 0,
-                        replication: 0,
+                        ttl: 600,
+                        replication: 4,
                         _reserved: 0,
                         key: *key,
                         value: value.clone(),
