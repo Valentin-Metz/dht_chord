@@ -465,7 +465,7 @@ impl Chord {
             {
                 debug!("Key {} found in node storage", key);
                 return Ok(value);
-            } else {
+            } else if !self.is_responsible_for_key(key) {
                 let peer = self.get_responsible_node(key).await?;
                 let (mut tx, mut rx) = connect_to_peer!(peer.address);
                 tx.send(PeerMessage::GetValue(key)).await?;
