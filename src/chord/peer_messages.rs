@@ -1,6 +1,17 @@
 //! Communication between peers
 //!
-//! # Lookup:
+//! We are using a data serialization library called "[channels-rs](https://crates.io/crates/channels)" to serialize and
+//! deserialize our data.
+//! This library allows us to transmit a struct/enum over TCP directly.
+//!
+//! Packet layout:
+//!
+//! ![](https://raw.githubusercontent.com/threadexio/channels-rs/master/spec/assets/packet-diagram-dark.svg)
+//!
+//! The exact protocol specification can be found [here](https://github.com/threadexio/channels-rs/blob/master/spec/PROTOCOL.md).
+//!
+//! More importantly, this means that we do *not* have to interact with a raw byte-level TCP socket.
+//! Instead, we simply transmit and match a [`PeerMessage`].
 //!
 use std::net::SocketAddr;
 use std::time::Duration;
@@ -20,11 +31,6 @@ pub struct ChordPeer {
 }
 
 /// All communication messages sent between peers
-///
-/// The enum itself is serialized and deserialized through [channels](https://docs.rs/channels/0.10.0/channels/).
-/// The exact protocol specification can be found [here](https://github.com/threadexio/channels-rs/blob/master/spec/PROTOCOL.md).
-///
-/// Internally, we just match the enum variants and perform the corresponding actions.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PeerMessage {
     GetNode(u64),
