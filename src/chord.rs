@@ -806,10 +806,9 @@ impl Chord {
         Err(anyhow!("Did not find any contactable node in finger table"))
     }
 
-    /// This method attempts to contact the predecessor at the given index.
-    /// If this predecessor is not reachable, or any other issue occurs an error is returned
-    ///
-    /// If this connection is successful the predecessor list is modified accordingly
+    /// Attempts to contact the predecessor at the given index.
+    /// If this predecessor is not reachable, or any other issue occurs, an error is returned.
+    /// If this connection is successful the predecessor list is modified accordingly.
     async fn stabilize_predecessor(&self, predecessor_index: usize) -> Result<()> {
         let some_predecessor = self.state.predecessors.read()[predecessor_index];
 
@@ -840,11 +839,11 @@ impl Chord {
         }
     }
 
-    /// This method attempts to contact the given possible successor.
-    /// If this successor is not reachable, or any other issue occurs an error is returned
-    ///
-    /// If the successor is reachable, this method will also iteratively find any reachable
-    /// predecessor of the successor, to arrive at the last reachable successor before this node
+    /// Attempts to contact the given successor.
+    /// If the successor is not reachable, or any other issue occurs, an error is returned.
+    /// If the successor is reachable,
+    /// this method will iteratively find any reachable predecessor of the successor,
+    /// and return the last reachable successor before this node.
     async fn stabilize_successor(&self, possible_successor: ChordPeer) -> Result<ChordPeer> {
         let mut closest_reachable_successor = possible_successor;
         let mut next_possible_successor = closest_reachable_successor;
@@ -1277,7 +1276,6 @@ fn calculate_hash<T: Hash>(t: &T) -> u64 {
 /// Simple test case for the [`is_between_on_ring`] method
 #[test]
 fn test_is_between_on_ring() {
-    // using common code.
     assert_ne!(
         is_between_on_ring(
             15203477739406956416,
