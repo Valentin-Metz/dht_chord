@@ -111,17 +111,15 @@ pub struct Chord {
 
 /// All data necessary for DHT operation
 struct ChordState {
-    /// Our own Node-ID
+    /// Our own Node-ID.
     node_id: u64,
 
     /// Our outward facing address.
-    ///
     /// Note that as it is used to calculate the node id,
-    /// it must be the address we are reachable under to other nodes
+    /// it must be the address we are reachable under to other nodes.
     address: SocketAddr,
 
-    /// The characteristic [Chord](https://en.wikipedia.org/wiki/Chord_(peer-to-peer)) jump table
-    ///
+    /// The characteristic [Chord](https://en.wikipedia.org/wiki/Chord_(peer-to-peer)) jump table.
     /// We maintain 64 entries with exponentially growing distance between them.
     /// As we are expected to do maintenance and handle churn - even under heavy load,
     /// entries are lockable individually.
@@ -129,10 +127,10 @@ struct ChordState {
     finger_table: Vec<RwLock<ChordPeer>>,
 
     /// We maintain a list of predecessors do determine key responsibility
-    /// and provide limited fault tolerance in case of churn
+    /// and provide limited fault tolerance in case of churn.
     predecessors: RwLock<Vec<ChordPeer>>,
 
-    /// Default storage duration of entries, if not specified otherwise
+    /// Default storage duration of entries, if not specified otherwise.
     default_storage_duration: Duration,
 
     /// The maximum duration for which we keep an item
@@ -140,8 +138,7 @@ struct ChordState {
     /// Does not apply to [`personal_storage`](ChordState::personal_storage).
     max_storage_duration: Duration,
 
-    /// The default amount of replications which are done for each entry
-    ///
+    /// The default amount of replications which are done for each entry.
     /// Replications are performed
     /// by increasing the key the entry is stored under by 1 and re-hashing the result.
     default_replication_amount: u8,
