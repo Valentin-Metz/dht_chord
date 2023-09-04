@@ -12,7 +12,6 @@
 //!
 //! More importantly, this means that we do *not* have to interact with a raw byte-level TCP socket.
 //! Instead, we simply transmit and match a [`PeerMessage`].
-//!
 use std::net::SocketAddr;
 use std::time::Duration;
 
@@ -33,22 +32,64 @@ pub struct ChordPeer {
 /// All communication messages sent between peers
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PeerMessage {
+    /// Get node responsible for key
+    ///
+    /// This is the "backbone message" of our Chord-DHT. It can be sent to *any node* in the network,
+    /// which will then respond with the IP address of the node responsible for the given key.
     GetNode(u64),
+    /// Response to [`PeerMessage::GetNode`]
     GetNodeResponse(ChordPeer),
+
+    /// Get value from responsible node
+    ///
+    /// Retrieves content from *one node and one node only*.
+    /// It *must* be sent to the node that is responsible for storing *that specific id*
+    /// and will **not** propagate through the network.
     GetValue(u64),
+    /// Response to [`PeerMessage::GetValue`]
     GetValueResponse(Option<Vec<u8>>),
+
+    /// Insert value into responsible node
+    ///
+    /// Inserts content into the network; counterpart to GetValue(id).
+    /// It must only be sent to the node responsible for the key that the value is to be stored under.
     InsertValue(u64, Vec<u8>, Duration),
+
+    /// Requests a node to split
+    ///
+    /// The target node performs some sanity checks,
+    /// ensuring that there is no other node between the new node and itself.
     SplitRequest(ChordPeer),
+    /// Response to [`PeerMessage::SplitRequest`]
+    ///
+    /// If a node is between the new node and the target node,
+    /// it returns the address of the node between them.
+    /// Otherwise it returns a list of values the new node is now responsible for.
     SplitResponse(SplitResponse),
+
+    /// Retrieves the predecessor of a node
     GetPredecessor,
+    /// Response to [`PeerMessage::GetPredecessor`]
     GetPredecessorResponse(ChordPeer),
+
+    /// Sets the predecessor of a node
     SetPredecessor(ChordPeer),
+    /// Sets the successor of a node
     SetSuccessor(ChordPeer),
+
+    /// Requests a node to solve a [`ProofOfWorkChallenge`]
     ProofOfWorkChallenge(ProofOfWorkChallenge),
+    /// Response to [`PeerMessage::ProofOfWorkChallenge`]
     ProofOfWorkResponse(ProofOfWorkResponse),
+
+    /// Signals intent to gracefully close the connection; acting as EOF
     CloseConnection,
 }
 
+/// Response to [`PeerMessage::SplitRequest`]
+///
+/// Contains either a list of key-value pairs the new node is now responsible for,
+/// or the node that should be asked to split instead.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum SplitResponse {
     Success(Vec<(u64, Vec<u8>)>),
