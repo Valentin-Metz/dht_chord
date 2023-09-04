@@ -338,8 +338,6 @@ pub(crate) async fn start_api_server(
                             warn!("Error in API connection on port {}: {}", api_address, e)
                         }
                     });
-                    } else {
-                        // todo: housekeeping thread
                     }
                 }
                 _ = cancellation_token.cancelled() => {
