@@ -165,7 +165,7 @@ impl Chord {
     /// They are then contacted to transfer responsibility of the entries this node is responsible for.
     ///
     /// The finger table will be initialized with all entries
-    /// pointing to our successor until the first run of [Chord::housekeeping].
+    /// pointing to our successor until the first run of housekeeping.
     pub async fn new(
         initial_peer: Option<SocketAddr>,
         server_address: SocketAddr,
@@ -513,7 +513,7 @@ impl Chord {
     /// Queries the network for a given key and returns its corresponding value.
     ///
     /// If the value can not be found on the first try,
-    /// up to [`ChordState::default_replication_amount`] backup keys are tried.
+    /// we also query for replicated backup keys.
     pub async fn get(&self, key: u64) -> Option<Vec<u8>> {
         debug!(
             "{} received API get request for key {}",
@@ -895,10 +895,11 @@ impl Chord {
         Ok(closest_reachable_successor)
     }
 
-    /// Iterates through all finger table entries and asks the previous entry about the peer in the next entry
+    /// Iterates through all finger table entries
+    /// and asks the previous entry about the peer in the next entry.
     ///
-    /// This ensures that all finger table entries point to the successor of 2^index where index is
-    /// the index in the finger table
+    /// This ensures that all finger table entries point to the successor of 2^index,
+    /// where index is the index in the finger table.
     pub(crate) async fn fix_fingers(&self) -> Result<()> {
         if self.state.predecessors.read().is_empty() {
             // If we have no predecessor, we are alone and there is nothing to stabilize
