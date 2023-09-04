@@ -510,10 +510,10 @@ impl Chord {
         Ok(())
     }
 
-    /// Returns the value corresponding to the key, if it can be found in the whole network
+    /// Queries the network for a given key and returns its corresponding value.
     ///
     /// If the value can not be found on the first try,
-    /// [`ChordState::default_replication_amount`] backup keys are tried.
+    /// up to [`ChordState::default_replication_amount`] backup keys are tried.
     pub async fn get(&self, key: u64) -> Option<Vec<u8>> {
         debug!(
             "{} received API get request for key {}",
@@ -557,10 +557,11 @@ impl Chord {
         None
     }
 
-    /// Returns if this node is responsible for the given key.
+    /// Returns whether this node is responsible for a given key.
     ///
     /// This is the case if the key lies between us (inclusive) and our predecessor (exclusive)
-    /// or no predecessor is currently known in which case this method always returns true
+    /// or no predecessor is currently known,
+    /// in which case this method returns true.
     fn am_responsible_for_key(&self, key: u64) -> bool {
         if let Some(predecessor) = self.state.predecessors.read().first() {
             is_between_on_ring(key, predecessor.id, self.state.node_id)
