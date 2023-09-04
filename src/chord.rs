@@ -547,7 +547,7 @@ impl Chord {
                         debug!("Key {} found on peer {}", key, peer.address);
                         return Ok(value);
                     }
-                    return Err(anyhow!("Key not found"));
+                    Err(anyhow!("Key not found"))
                 }
                 if let Ok(value) = query_key(key, peer).await {
                     return Some(value);
@@ -670,8 +670,8 @@ impl Chord {
 
     /// Stabilized this node
     ///
-    /// This method will contact the predecessor:
-    /// - If the predecessor is reachable it will check that this node and the predecessor are in
+    /// We contact our predecessor:
+    /// - If the predecessor is reachable, we check that this node and the predecessor are in
     /// agreement about no nodes existing between them.
     /// If there are any, we set them as our predecessor
     /// - If the predecessor is not reachable,
@@ -679,16 +679,14 @@ impl Chord {
     /// until an active node is found.
     /// We then send this predecessor the message that we are his successor.
     ///
-    /// Once the predecessor has been stabilized, three more predecessors are recursively acquired
-    /// in case the immediate predecessor is no longer reachable
+    /// Once the predecessor has been stabilized,
+    /// three more predecessors are recursively acquired to guard against churn.
     ///
-    /// Secondly the successor is contacted, which is identical with the first entry in the finger table.
-    /// - If the successor is reachable, agreement is ensured that no node is inbetween or correct the overlay
-    /// - If the successor is not reachable, the next furthers unique peer in the finger table is found
-    /// and contacted.
-    /// - This peer is then iteratively updated until we either found this node or an unreachable peer
-    /// in which case we contact the last reachable peer and set this node as successor and update
-    /// our finger table accordingly
+    /// We contact our successor (the first node in our [`ChordState::finger_table`]):
+    /// - If the successor is reachable, we again ensure that there are no nodes between us
+    /// or update the finger table accordingly.
+    /// - If the successor is not reachable, the next peer in the finger table is contacted,
+    /// until we either find a working node or reach the end of the finger table.
     pub(crate) async fn stabilize(&self) -> Result<()> {
         if self.state.predecessors.read().is_empty() {
             // If we have no predecessor, we are alone and there is nothing to stabilize
@@ -781,7 +779,6 @@ impl Chord {
                 Ok(successor) => {
                     if successor.address == self.state.address {
                         // Nothing to do, successor is alive and knows about us
-
                         return Ok(());
                     }
 
@@ -806,7 +803,6 @@ impl Chord {
                 }
             }
         }
-
         Err(anyhow!("Did not find any contactable node in finger table"))
     }
 
