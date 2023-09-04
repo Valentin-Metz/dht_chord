@@ -495,7 +495,7 @@ impl Chord {
     }
 
     /// Inserts an entry into our local [`node_storage`](ChordState::node_storage),
-    /// alongside their expiry time.
+    /// alongside its expiry time.
     async fn internal_insert(&self, key: u64, value: Vec<u8>, ttl: Duration) -> Result<()> {
         debug_assert!(self.am_responsible_for_key(key));
         if self.state.max_storage_duration > ttl {
@@ -512,8 +512,8 @@ impl Chord {
 
     /// Returns the value corresponding to the key, if it can be found in the whole network
     ///
-    /// If this value is not findable or an error occurred while trying to find the value,
-    /// this error is returned
+    /// If the value can not be found on the first try,
+    /// [`ChordState::default_replication_amount`] backup keys are tried.
     pub async fn get(&self, key: u64) -> Option<Vec<u8>> {
         debug!(
             "{} received API get request for key {}",
