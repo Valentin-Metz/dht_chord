@@ -938,7 +938,7 @@ impl Chord {
         Ok(())
     }
 
-    /// Returns a [`ChordPeer`] representing this node, useful for peer communication
+    /// Returns a [`ChordPeer`] representing this node; useful for peer communication.
     fn as_chord_peer(&self) -> ChordPeer {
         ChordPeer {
             id: self.state.node_id,
@@ -971,13 +971,7 @@ impl Chord {
         }
     }
 
-    /// Returns a result with the successor of `node_to_ask`.
-    /// If the provided peer is not reachable an error is returned
-    ///
-    ///
-    /// # Arguments
-    ///
-    /// * `node_to_ask` - the node to ask for its predecessor
+    /// Asks a [`ChordPeer`] for its successor
     async fn ask_for_successor(&self, node_to_ask: ChordPeer) -> Result<ChordPeer> {
         let (mut tx, mut rx) = connect_to_peer!(node_to_ask.address);
         // Add one to the id we ask for, as the successor is responsible for this key
@@ -987,7 +981,6 @@ impl Chord {
         match rx.recv().await? {
             PeerMessage::GetNodeResponse(peer) => {
                 tx.send(PeerMessage::CloseConnection).await?;
-
                 Ok(peer)
             }
             _ => {
@@ -997,15 +990,14 @@ impl Chord {
         }
     }
 
-    /// Returns the address on which this node is listening for incoming connections
+    /// Returns the address on which this node is listening for incoming connections.
     #[cfg(test)]
     pub(crate) fn get_address(&self) -> SocketAddr {
         self.state.address
     }
 
-    /// Returns the predecessor of this node
-    ///
-    /// If no predecessor is present, it returns this node as [`ChordPeer`]
+    /// Returns the predecessor of this node.
+    /// If we do not have a successor, we return ourselves as [`ChordPeer`].
     fn get_predecessor(&self) -> ChordPeer {
         *self
             .state
