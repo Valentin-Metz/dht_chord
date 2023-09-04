@@ -157,50 +157,6 @@ struct ChordState {
 }
 
 impl Chord {
-    /// Starts the server socket to listen for incoming peer connections
-    /// The cancellation token can be used to gracefully stop the server socet
-    pub async fn start_server_socket(
-        &self,
-        cancellation_token: CancellationToken,
-    ) -> JoinHandle<()> {
-        let self_clone = Chord {
-            state: self.state.clone(),
-        };
-        let listener = TcpListener::bind(self.state.address)
-            .await
-            .expect("Failed to bind Chord server socket");
-        // Open channel for inter thread communication
-        let (tx, mut rx) = mpsc::channel(1);
-
-        let handle = tokio::spawn(async move {
-            // Send signal that we are running
-            tx.send(true).await.expect("Unable to send message");
-            info!("Chord listening for peers on {}", self_clone.state.address);
-            loop {
-                tokio::select! {
-                    result = listener.accept() => {
-                    let (stream, _) = result.unwrap();
-                    let self_clone = Chord {
-                        state: self_clone.state.clone(),
-                    };
-                    tokio::spawn(async move {
-                            if let Err(e) = self_clone.accept_peer_connection(stream).await {
-                                error!("Error in connection {:?}", e);
-                            }
-                    });
-                    }
-                    _ = cancellation_token.cancelled() => {
-                        info!("{}: Stopped accepting new peer connections.", self_clone.state.address);
-                        break;
-                    }
-                }
-            }
-        });
-        // Await thread spawn, to avoid EOF errors because the thread is not ready to accept messages
-        rx.recv().await.unwrap();
-        handle
-    }
-
     /// Construct new instance of chord.
     ///
     /// If no initial peer is provided, it is assumed that this node is the only node present.
@@ -360,6 +316,50 @@ impl Chord {
                 }),
             }
         }
+    }
+
+    /// Starts the server socket to listen for incoming peer connections
+    /// The cancellation token can be used to gracefully stop the server socket
+    pub async fn start_server_socket(
+        &self,
+        cancellation_token: CancellationToken,
+    ) -> JoinHandle<()> {
+        let self_clone = Chord {
+            state: self.state.clone(),
+        };
+        let listener = TcpListener::bind(self.state.address)
+            .await
+            .expect("Failed to bind Chord server socket");
+        // Open channel for inter thread communication
+        let (tx, mut rx) = mpsc::channel(1);
+
+        let handle = tokio::spawn(async move {
+            // Send signal that we are running
+            tx.send(true).await.expect("Unable to send message");
+            info!("Chord listening for peers on {}", self_clone.state.address);
+            loop {
+                tokio::select! {
+                    result = listener.accept() => {
+                    let (stream, _) = result.unwrap();
+                    let self_clone = Chord {
+                        state: self_clone.state.clone(),
+                    };
+                    tokio::spawn(async move {
+                            if let Err(e) = self_clone.accept_peer_connection(stream).await {
+                                error!("Error in connection {:?}", e);
+                            }
+                    });
+                    }
+                    _ = cancellation_token.cancelled() => {
+                        info!("{}: Stopped accepting new peer connections.", self_clone.state.address);
+                        break;
+                    }
+                }
+            }
+        });
+        // Await thread spawn, to avoid EOF errors because the thread is not ready to accept messages
+        rx.recv().await.unwrap();
+        handle
     }
 
     /// Method to start the housekeeping thread
@@ -938,7 +938,7 @@ impl Chord {
         Ok(())
     }
 
-    /// Returns a cord peer representing this node, useful for peer communication
+    /// Returns a [`ChordPeer`] representing this node, useful for peer communication
     fn as_chord_peer(&self) -> ChordPeer {
         ChordPeer {
             id: self.state.node_id,
@@ -1206,31 +1206,6 @@ impl Chord {
                 panic!("Reached invalid state");
             }
         }
-    }
-
-    /// Displays this node for debugging purposes
-    #[cfg(test)]
-    pub(crate) fn print_chord(&self) {
-        debug!("{}  {:x}", self.state.address, self.state.node_id);
-        debug!(
-            " S:{} {:x}",
-            self.state.finger_table[0].read().address,
-            self.state.finger_table[0].read().id
-        );
-        debug!(
-            " P:{} {:x}",
-            self.state.predecessors.read()[0].address,
-            self.state.predecessors.read()[0].id
-        );
-        debug!("Stored values:");
-        for (key, value) in self.state.node_storage.clone() {
-            debug!("  {:x}: {:?}", key, value);
-        }
-        debug!("Finger table:");
-        for entry in &self.state.finger_table[55..64] {
-            debug!("{:?}", *entry.read());
-        }
-        debug!("---");
     }
 }
 
