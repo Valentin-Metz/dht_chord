@@ -284,7 +284,7 @@ pub(crate) async fn start_api_server(
                             loop {
                                 let n = match reader.read(&mut buf).await {
                                     // socket closed
-                                    Ok(n) if n == 0 => return Ok(()),
+                                    Ok(0) => return Ok(()),
                                     Ok(n) => n,
                                     Err(e) => return Err(e.into()),
                                 };
