@@ -115,6 +115,7 @@ struct ChordState {
     node_id: u64,
 
     /// Our outward facing address.
+    ///
     /// Note that as it is used to calculate the node id,
     /// it must be the address we are reachable under to other nodes.
     address: SocketAddr,
@@ -126,7 +127,7 @@ struct ChordState {
     /// Small inconsistencies are tolerable, as they only affect routing efficiency.
     finger_table: Vec<RwLock<ChordPeer>>,
 
-    /// We maintain a list of predecessors do determine key responsibility
+    /// List of predecessors do determine key responsibility
     /// and provide limited fault tolerance in case of churn.
     predecessors: RwLock<Vec<ChordPeer>>,
 
