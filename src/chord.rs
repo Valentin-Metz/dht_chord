@@ -570,10 +570,10 @@ impl Chord {
         }
     }
 
-    /// Returns the [`ChordPeer`] responsible for the given key, or an error otherwise.
+    /// Returns the [`ChordPeer`] responsible for a given key.
     ///
-    /// This method will attempt to find suitable peer to ask about the responsible peer
-    /// in the finger table and contact it
+    /// This method attempts to recursively find the node responsible for a given key
+    /// by asking the most closely responsible node in our finger table to find it for us.
     async fn get_responsible_node(&self, key: u64) -> Result<ChordPeer> {
         // This method should never be called when we are responsible for this key
         debug_assert!(!self.am_responsible_for_key(key));
