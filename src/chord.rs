@@ -670,11 +670,14 @@ impl Chord {
 
     /// Stabilized this node
     ///
-    /// Firstly this method will contact the predecessor:
+    /// This method will contact the predecessor:
     /// - If the predecessor is reachable it will check that this node and the predecessor are in
-    /// agreement that there is no node between them, if there is we set that node as predecessor
-    /// - If the predecessor is not reachable we will iteratively contact predecessors until one is
-    /// found which is alive. We send this predecessor the message that we are his successor.
+    /// agreement about no nodes existing between them.
+    /// If there are any, we set them as our predecessor
+    /// - If the predecessor is not reachable,
+    /// we will iteratively step through our predecessor list in [`ChordState::predecessors`],
+    /// until an active node is found.
+    /// We then send this predecessor the message that we are his successor.
     ///
     /// Once the predecessor has been stabilized, three more predecessors are recursively acquired
     /// in case the immediate predecessor is no longer reachable
