@@ -18,7 +18,7 @@
 //!
 //! # Architecture:
 //!  - Our architecture separates the Chord module from the API communication
-//!  - The API simply makes the features of the Chord module accessible via network communication
+//!  - The API only makes the features of the Chord module accessible via network communication
 //! ### Threading:
 //!  - We make heavy use of multithreading/processing:
 //!     - [Tokio](https://docs.rs/tokio/latest/tokio/) (green) threads for all asynchronous workloads
@@ -52,16 +52,31 @@
 //! - Limited defence against nodes refusing to store values or disconnecting
 //!     - Our housekeeping thread continuously refreshes values that have been stored in the DHT upon our own request
 //!
-//! # Security evaluation: // todo
-//! - The inherent structure of the overlay offers some limited defense against id mapping attacks
-//!     - It is not easily possible to fool the peers around the intimidated identity, as they are already in direct contact
-//!     - Other nodes usually try to route requests as fast as possible into proximity of the intimidated identity
-//! - Likewise the finger table offers resistance against eclipse attacks
-//!     - Nodes regularly check in with all their fingers, which makes it hard to eclipse them fully with ongoing churn
-//!  - Stabilization method, which regularly checks the health of peers in neighborhood and fixes the overlay if necessary
-//!  - Storage and Retrieval attacks are partially mitigated by built in replication
-//!  - Inconsistent behaviour also partially mitigated by built in replication
-//!  - DoS Attacks such as content pollution and index poisoning are hardened against by PoW for insertion of values
+//! # Security discussion:
+//! - Byzantine fault tolerance is extremely difficult to achieve in a distributed system
+//! - We initially tried to implement a byzantine fault tolerance according to [this paper](https://www.cs.unm.edu/~treport/tr/05-04/chord.pdf),
+//! but came to the conclusion that it was not feasible to implement in the given time frame
+//! - Byzantine fault tolerance would require multiple complex submodules to be implemented, such as
+//!     - Secure multiparty computation
+//!     - Secure network size estimation
+//!     - A split of the overlay network into multiple swarms
+//! - We were not able to find a sufficiently advanced crate for secure multiparty computation
+//! and a (byzantine fault tolerant) network size estimation would carry the workload of an entire additional module
+//! - This is why we ultimately decided to only implement proof-of-work as a defence against greedy nodes
+//! - We understand that our system **can not defend** against a malicious attacker deliberately providing nodes with false information
+//! - We also understand that implementing such a system would not only be extremely difficult,
+//! but also extremely resource intensive and inefficient,
+//! as a significant amount of nodes would need to reach consensus on every single request
+//! - We do however note, that a few of our design choices should make attacks more difficult:
+//!     - Choosing IDs based on their IP address makes it harder for nodes to choose their position in the network
+//!     - This makes it more difficult to eclipse nodes
+//!     - The finger table also offers some resistance against eclipse attacks:
+//!         - Nodes regularly check in with all their fingers, which makes it difficult to eclipse them fully
+//!      - Our stabilization method regularly checks the health of peers in the neighborhood and fixes the overlay if necessary
+//!         - An attacker needs to operate their peers continuously, as they would otherwise be removed
+//!      - Overwriting values is possible, but expensive due to proof-of-work
+//!      - DoS Attacks, such as content pollution and index poisoning,
+//!      are hardened against by increased proof-of-work difficulty for write requests
 //!
 //! # Future Work:
 //!
