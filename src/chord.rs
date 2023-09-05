@@ -84,18 +84,38 @@
 //! no longer exists.
 //!
 //! # Work Distribution
-//!  - We usually worked closely together on the project, even including pair-programming
-//!  - Frequent communication and git allowed us to agilely distribute open tasks, further supported by automatic tests
-//!  - We helped each other out in solving open problems, bugs and making design decision
+//!  - We usually worked closely together on the project, including pair-programming
+//!  - Frequent communication and git allowed us to agilely distribute open tasks
+//!  - A CI/CD pipeline was used to continuously test our commits
+//!  - We assisted each other in solving open problems, bugs and making design decision
 //!  - In since the last report Eddie generally focused on core functionality like node joining, routing and stabilization
-//!  - Valentin on the other hand mostly focused on security features, housekeeping, and CI/CD Pipline for automatic testing and documentation deployment
+//!  - Valentin focused on security features, housekeeping, the CI/CD Pipline and documentation deployment
+//!  - Here are some git statistics to backup our claims of equal work distribution:
+//! ```bash
+//! git log --author="Valentin" --pretty=tformat: --numstat | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "Added lines: %s; Removed lines: %s; Total lines: %s\n", add, subs, loc }' -
+//! Added lines: 3313; Removed lines: 2223; Total lines: 1090
+//! ---
+//! git log --author="Eddie" --pretty=tformat: --numstat | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "Added lines: %s; Removed lines: %s; Total lines: %s\n", add, subs, loc }' -
+//! Added lines: 3634; Removed lines: 1773; Total lines: 1861
+//! ---
+//! git fame
+//! Total commits: 169
+//! Total ctimes: 1096
+//! Total files: 30
+//! Total loc: 10163
+//! | Author        |   loc |   coms |   fils |  distribution   |
+//! |:--------------|------:|-------:|-------:|:----------------|
+//! | Valentin Metz |  8730 |    120 |     21 | 85.9/71.0/70.0  |
+//! | Eddie Groh    |  1433 |     49 |      9 | 14.1/29.0/30.0  |
+//! ```
+//!
 //!
 //! # Effort Spend
-//!  - Since the midterm report, we were able to extend our framework without any major changes
+//!  - Since the midterm report, we were able to extend our framework without any major structural changes
 //!  - Therefore we were able to spend all effort on implementing new features
-//!  - Our effort therefore was spend on implementing everything named in the work distribution
-//!  - Additionally significant effort was spend on debugging multithreaded asynchronous code over multiple nodes
-//!  to realize the expected functionality of routing and stabilization
+//!  - We implemented everything listed in the work distribution
+//!  - Significant effort was spend debugging and testing our multithreaded code across multiple nodes,
+//!  ensuring the correct functionality of routing and stabilization
 //!  - Specifically for stabilize an own approach was developed to ensure proper functionality
 //!  with our implementation, augmented by the fact that there are few resources on how to handle
 //!  churn in chord
