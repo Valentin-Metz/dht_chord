@@ -96,7 +96,7 @@ pub enum SplitResponse {
     Failure(ChordPeer), // Predecessor that is responsible instead
 }
 
-/// [SHA-3-512](https://docs.rs/sha3/0.10.8/sha3/) based proof-of-work challenge
+/// [SHA-3-512](https://en.wikipedia.org/wiki/SHA-3)) based proof-of-work challenge
 ///
 /// The challenge consists of a difficulty setting and a random nonce.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
@@ -106,7 +106,7 @@ pub struct ProofOfWorkChallenge {
 }
 
 impl ProofOfWorkChallenge {
-    /// Creates a new proof-of-work challenge with the given difficulty
+    /// Creates a new proof-of-work challenge with the given difficulty.
     pub fn new(difficulty: usize) -> Self {
         Self {
             nonce: random(),
@@ -139,7 +139,7 @@ impl ProofOfWorkChallenge {
         }
     }
 
-    /// Checks if the given response is a valid solution to this challenge
+    /// Checks if the given response is a valid solution to this challenge.
     pub fn check(&self, response: ProofOfWorkResponse) -> bool {
         let mut hasher = Sha3_512::new();
         hasher.update(self.nonce.to_le_bytes());
