@@ -116,21 +116,23 @@
 //! - The resulting codebase has ~2700 lines of code
 //! - Here are some git statistics to backup our claims of equal work distribution:
 //! ```bash
+//! commit 3c18e19055bac1da5c56bbfac85d0b9a0351bed6:
+//! ---
 //! git log --author="Valentin" --pretty=tformat: --numstat | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "Added lines: %s; Removed lines: %s; Total lines: %s\n", add, subs, loc }' -
-//! Added lines: 3313; Removed lines: 2223; Total lines: 1090
+//! Added lines: 3428; Removed lines: 2297; Total lines: 1131
 //! ---
 //! git log --author="Eddie" --pretty=tformat: --numstat | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "Added lines: %s; Removed lines: %s; Total lines: %s\n", add, subs, loc }' -
-//! Added lines: 3634; Removed lines: 1773; Total lines: 1861
+//! Added lines: 3653; Removed lines: 1789; Total lines: 1864
 //! ---
 //! git fame
-//! Total commits: 169
-//! Total ctimes: 1096
+//! Total commits: 177
+//! Total ctimes: 1129
 //! Total files: 30
-//! Total loc: 10163
+//! Total loc: 10207
 //! | Author        |   loc |   coms |   fils |  distribution   |
 //! |:--------------|------:|-------:|-------:|:----------------|
-//! | Valentin Metz |  8730 |    120 |     21 | 85.9/71.0/70.0  |
-//! | Eddie Groh    |  1433 |     49 |      9 | 14.1/29.0/30.0  |
+//! | Valentin Metz |  8810 |    126 |     21 | 86.3/71.2/70.0  |
+//! | Eddie Groh    |  1397 |     51 |      9 | 13.7/28.8/30.0  |
 //! ```
 //!
 //!
