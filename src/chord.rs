@@ -63,32 +63,32 @@
 //!  - Inconsistent behaviour also partially mitigated by built in replication
 //!  - DoS Attacks such as content pollution and index poisoning are hardened against by PoW for insertion of values
 //!
-//! # Future Work
+//! # Future Work:
 //!
-//! ## Improved Sybil defence
+//! ## Improved Sybil defence:
 //! - It would likely be sensible to introduce further hardware such as bandwidth(with respective scanners)
 //! - New nodes should be treated differently, i.e. not as trustworthy until they stayed some time in the network
 //! - This would also help with other attacks
 //!
-//! ## Misbehaviour defence
+//! ## Misbehaviour defence:
 //! Currently only crash faults are dealt with. Malicious faults will go undetected.
 //! Local nodes could determine if a peer is misbehaving and exclude it from the overlay.
 //! However peers know their neighbors and could therefore act differently to different peers.
 //! Defending against such behaviour is hard, as for example a reporting system or similarly can
 //! be abused by malicious peers to get "good" nodes excluded from the network.
 //!
-//! ## Better Stabilize
+//! ## Better Stabilize:
 //! Stabilize in its current form relies on each node to realize that a peer disconnected from the network
 //! This sometimes incorrectly invalidates `SetPredecessor` and `SetSuccessor` Requests, as they are
 //! denied on the grounds that the receiving node does not know yet that its current successor/predecessor
 //! no longer exists.
 //!
-//! # Work Distribution
+//! # Work Distribution:
 //!  - We usually worked closely together on the project, including pair-programming
 //!  - Frequent communication and git allowed us to agilely distribute open tasks
 //!  - A CI/CD pipeline was used to continuously test our commits
 //!  - We assisted each other in solving open problems, bugs and making design decision
-//!  - In since the last report Eddie generally focused on core functionality like node joining, routing and stabilization
+//!  - Since the last report Eddie generally focused on core functionality like node joining, routing and stabilization
 //!  - Valentin focused on security features, housekeeping, the CI/CD Pipline and documentation deployment
 //!  - Here are some git statistics to backup our claims of equal work distribution:
 //! ```bash
@@ -110,17 +110,15 @@
 //! ```
 //!
 //!
-//! # Effort Spend
+//! # Effort Spent:
 //!  - Since the midterm report, we were able to extend our framework without any major structural changes
-//!  - Therefore we were able to spend all effort on implementing new features
+//!  - Therefore we were able to spend most of our effort on implementing new features
 //!  - We implemented everything listed in the work distribution
 //!  - Significant effort was spend debugging and testing our multithreaded code across multiple nodes,
 //!  ensuring the correct functionality of routing and stabilization
-//!  - Specifically for stabilize an own approach was developed to ensure proper functionality
-//!  with our implementation, augmented by the fact that there are few resources on how to handle
-//!  churn in chord
-//!  - Otherwise there has also been design effort to design and evaluate different approaches
-//!  for security to arrive at the system we implemented
+//!  - We developed our own stabilization approach that is able to efficiently handle churn
+//!  - We implemented a proof-of-work system and the ability to handle crashing / non-maliciously misbehaving nodes
+//!  - We have also put significant effort into the correct and full documentation and of our codebase
 
 use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
