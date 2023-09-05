@@ -43,18 +43,25 @@
 //!  - Inconsistent behaviour also partially mitigated by built in replication
 //!  - DoS Attacks such as content pollution and index poisoning are hardened against by PoW for insertion of values
 //!
-//! # Architecture
-//!  - Our architecture separates the Chord module from the API communication.
+//! # Architecture:
+//!  - Our architecture separates the Chord module from the API communication
 //!  - The API simply makes the features of the Chord module accessible via network communication
-//!  - We make heavy use of multithreading/processing, using tokio's (green) threads for all asynchronous workloads, like
-//!       I/O.
-//!     
-//! ## Peer-to-peer communication
-//!  - We are using Rust channels for inter-node communication (this allows us to serialize/deserialize entire structs
-//!    typesafe and integrity checked)
-//!  - All inter-node messages are specified in [`PeerMessage`]
-//!  - Errors are passed up the stack and are processed accordingly. This means that for example an
-//!  unexpected error while communicating with a node only leads to the unexpected end of this connection
+//! ### Threading:
+//!  - We make heavy use of multithreading/processing:
+//!     - [Tokio](https://docs.rs/tokio/latest/tokio/) (green) threads for all asynchronous workloads
+//!     - Every connecting API and P2P client gets its own thread
+//!     - Housekeeping is performed in a background thread without blocking table operations
+//! ### Peer-to-peer communication:
+//!  - We are using [channels](https://crates.io/crates/channels) for inter-node communication
+//!     - This allows us to serialize/deserialize entire structs
+//!    typesafe and integrity checked
+//!     - Protocol details are specified in the [`peer_messages`] module
+//!     - Inter-node messages are specified in [`PeerMessage`]
+//!  - Nodes exiting unexpectedly or sending invalid messages do not crash other nodes
+//!     - Errors are detected (and logged if desired) and the connection to the misbehaving node is closed
+//!     - Non-responding nodes are detected by the housekeeping thread and removed from the overlay
+//!  - This gives us robustness against non-byzantine faults
+//!  - Nodes that *appear* to perform correctly, yet send well-formed but disruptive messages can not be detected
 //!
 //! ## Peer-to-peer protocol
 //! Short sketch of the messages exchanged to give a basic understanding how the protocol works.
