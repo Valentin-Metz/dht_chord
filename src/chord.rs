@@ -36,7 +36,7 @@
 //!  - This gives us robustness against non-byzantine faults
 //!  - Nodes that *appear* to perform correctly, yet send well-formed but disruptive messages can not be detected
 //!
-//! # Security measures:
+//! # Security features:
 //! - [SHA-3-512](https://docs.rs/sha3/0.10.8/sha3/) proof of work challenges with adjustable difficulty for requests
 //!     - Does not prevent [byzantine](https://en.wikipedia.org/wiki/Byzantine_fault) nodes from splitting the network or eclipsing nodes,
 //!     but prevents greedy nodes from abusing the storage system
