@@ -1311,6 +1311,7 @@ async fn solve_proof_of_work(
     Ok(())
 }
 
+/// Calculate hash for ID-mapping
 fn calculate_hash<T: Hash>(t: &T) -> u64 {
     let mut s = DefaultHasher::new();
     t.hash(&mut s);
