@@ -30,6 +30,9 @@ pub struct ChordPeer {
 }
 
 /// All communication messages sent between peers
+///
+/// Whenever we transmit a message between nodes,
+/// we transmit this enum and match on it on the receiving end.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PeerMessage {
     /// Get node responsible for key
