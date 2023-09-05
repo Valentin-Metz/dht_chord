@@ -16,6 +16,26 @@
 //! - Performance optimized implementation, capable of establishing a fully connected network with 2000
 //! nodes running on a single machine in under 10 seconds (without PoW)
 //!
+//! # Architecture:
+//!  - Our architecture separates the Chord module from the API communication
+//!  - The API simply makes the features of the Chord module accessible via network communication
+//! ### Threading:
+//!  - We make heavy use of multithreading/processing:
+//!     - [Tokio](https://docs.rs/tokio/latest/tokio/) (green) threads for all asynchronous workloads
+//!     - Every connecting API and P2P client gets its own thread
+//!     - Housekeeping is performed in a background thread without blocking table operations
+//! ### Peer-to-peer communication:
+//!  - We are using [channels](https://crates.io/crates/channels) for inter-node communication
+//!     - This allows us to serialize/deserialize entire structs
+//!    typesafe and integrity checked
+//!     - Protocol details are specified in the [`peer_messages`] module
+//!     - Inter-node messages are specified in [`PeerMessage`]
+//!  - Nodes exiting unexpectedly or sending invalid messages do not crash other nodes
+//!     - Errors are detected (and logged if desired) and the connection to the misbehaving node is closed
+//!     - Non-responding nodes are detected by the housekeeping thread and removed from the overlay
+//!  - This gives us robustness against non-byzantine faults
+//!  - Nodes that *appear* to perform correctly, yet send well-formed but disruptive messages can not be detected
+//!
 //! # Security measures:
 //! - [SHA-3-512](https://docs.rs/sha3/0.10.8/sha3/) proof of work challenges with adjustable difficulty for requests
 //!     - Does not prevent [byzantine](https://en.wikipedia.org/wiki/Byzantine_fault) nodes from splitting the network or eclipsing nodes,
@@ -42,45 +62,6 @@
 //!  - Storage and Retrieval attacks are partially mitigated by built in replication
 //!  - Inconsistent behaviour also partially mitigated by built in replication
 //!  - DoS Attacks such as content pollution and index poisoning are hardened against by PoW for insertion of values
-//!
-//! # Architecture:
-//!  - Our architecture separates the Chord module from the API communication
-//!  - The API simply makes the features of the Chord module accessible via network communication
-//! ### Threading:
-//!  - We make heavy use of multithreading/processing:
-//!     - [Tokio](https://docs.rs/tokio/latest/tokio/) (green) threads for all asynchronous workloads
-//!     - Every connecting API and P2P client gets its own thread
-//!     - Housekeeping is performed in a background thread without blocking table operations
-//! ### Peer-to-peer communication:
-//!  - We are using [channels](https://crates.io/crates/channels) for inter-node communication
-//!     - This allows us to serialize/deserialize entire structs
-//!    typesafe and integrity checked
-//!     - Protocol details are specified in the [`peer_messages`] module
-//!     - Inter-node messages are specified in [`PeerMessage`]
-//!  - Nodes exiting unexpectedly or sending invalid messages do not crash other nodes
-//!     - Errors are detected (and logged if desired) and the connection to the misbehaving node is closed
-//!     - Non-responding nodes are detected by the housekeeping thread and removed from the overlay
-//!  - This gives us robustness against non-byzantine faults
-//!  - Nodes that *appear* to perform correctly, yet send well-formed but disruptive messages can not be detected
-//!
-//! ## Peer-to-peer protocol
-//! Short sketch of the messages exchanged to give a basic understanding how the protocol works.
-//!
-//! For understandability the processes are reduced and do not server as complete description.
-//!
-//! All processes are terminated by a [PeerMessage::CloseConnection]. This allows to send other requests
-//! after completing a process without needing to create a new connection.
-//!       
-//! ### Joining the Network
-//!
-//! - send [PeerMessage::GetNode] to obtain node responsible for own identifier
-//! - send [PeerMessage::SplitRequest] to obtain either the keys the new node is responsible or the
-//! actual responsible node if the overlay changed since the first request
-//! - send [PeerMessage::SetSuccessor] to the predecessor of the responsible node
-//!
-//! ### Retrieving or String a Value
-//! - send [PeerMessage::GetNode] to obtain the node responsible for the key
-//! - send [PeerMessage::GetValue] or [PeerMessage::InsertValue] to retrieve or set the value
 //!
 //! # Future Work
 //!

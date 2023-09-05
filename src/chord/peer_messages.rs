@@ -39,6 +39,8 @@ pub enum PeerMessage {
     ///
     /// This is the "backbone message" of our Chord-DHT. It can be sent to *any node* in the network,
     /// which will then respond with the IP address of the node responsible for the given key.
+    /// As we can use this message to lookup both keys and nodes,
+    /// it is the only message type that needs to propagate recursively through the network.
     GetNode(u64),
     /// Response to [`PeerMessage::GetNode`]
     GetNodeResponse(ChordPeer),
