@@ -96,7 +96,7 @@ pub enum SplitResponse {
     Failure(ChordPeer), // Predecessor that is responsible instead
 }
 
-/// [SHA-3-512](https://en.wikipedia.org/wiki/SHA-3)) based proof-of-work challenge
+/// [SHA-3-512](https://en.wikipedia.org/wiki/SHA-3) based proof-of-work challenge
 ///
 /// The challenge consists of a difficulty setting and a random nonce.
 #[derive(Serialize, Deserialize, Debug, Copy, Clone)]
