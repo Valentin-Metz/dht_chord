@@ -79,33 +79,36 @@
 //!      are hardened against by increased proof-of-work difficulty for write requests
 //!
 //! # Future Work:
+//! We have some ideas/suggestions on how to further improve our implementation:
 //!
-//! ## Improved Sybil defence:
-//! - It would likely be sensible to introduce further hardware such as bandwidth(with respective scanners)
+//! ## Improved sybil defence:
+//! - Currently we hash the IP and port of a node to determine its ID
+//!     - This could be easily adjusted to only hash IPs, making it harder to choose node position
 //! - New nodes should be treated differently, i.e. not as trustworthy until they stayed some time in the network
-//! - This would also help with other attacks
+//! - We could introduce active scanning measures to track whether nodes are truly active and responsive
 //!
 //! ## Misbehaviour defence:
-//! Currently only crash faults are dealt with. Malicious faults will go undetected.
-//! Local nodes could determine if a peer is misbehaving and exclude it from the overlay.
-//! However peers know their neighbors and could therefore act differently to different peers.
-//! Defending against such behaviour is hard, as for example a reporting system or similarly can
-//! be abused by malicious peers to get "good" nodes excluded from the network.
+//! - The most efficient way to "cheaply" detect misbehaving nodes would probably be an out-of-band
+//! reporting system and/or a scanning authority that secretly scans for misbehaving nodes and blacklists them,
+//! similarly to how [The Tor Project](https://www.torproject.org/) detects and blacklists misbehaving relays
+//! - This would however, go *against* the decentralization aspect of our system
 //!
 //! ## Better Stabilize:
-//! Stabilize in its current form relies on each node to realize that a peer disconnected from the network
-//! This sometimes incorrectly invalidates `SetPredecessor` and `SetSuccessor` Requests, as they are
-//! denied on the grounds that the receiving node does not know yet that its current successor/predecessor
-//! no longer exists.
+//! - Stabilize in its current form relies on each node to individually realize that a peer has disconnected from the network
+//! - This sometimes incorrectly invalidates `SetPredecessor` and `SetSuccessor` requests,
+//! as they are denied on the grounds that the receiving node does not yet know,
+//! that its current successor/predecessor no longer exists
 //!
 //! # Work Distribution:
-//!  - We usually worked closely together on the project, including pair-programming
-//!  - Frequent communication and git allowed us to agilely distribute open tasks
-//!  - A CI/CD pipeline was used to continuously test our commits
-//!  - We assisted each other in solving open problems, bugs and making design decision
-//!  - Since the last report Eddie generally focused on core functionality like node joining, routing and stabilization
-//!  - Valentin focused on security features, housekeeping, the CI/CD Pipline and documentation deployment
-//!  - Here are some git statistics to backup our claims of equal work distribution:
+//! - We usually worked closely together on the project, including pair-programming
+//! - Frequent communication and git allowed us to agilely distribute open tasks
+//! - A CI/CD pipeline was used to continuously test our commits
+//! - We assisted each other in solving open problems, bugs and making design decision
+//! - Since the last report Eddie generally focused on core functionality like node joining, routing and stabilization
+//! - Valentin focused on security features, housekeeping, the CI/CD Pipline and documentation deployment
+//! - Together, we committed over 10.000 lines of code in more than 170 commits
+//! - The resulting codebase has ~2700 lines of code
+//! - Here are some git statistics to backup our claims of equal work distribution:
 //! ```bash
 //! git log --author="Valentin" --pretty=tformat: --numstat | gawk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf "Added lines: %s; Removed lines: %s; Total lines: %s\n", add, subs, loc }' -
 //! Added lines: 3313; Removed lines: 2223; Total lines: 1090
@@ -126,14 +129,14 @@
 //!
 //!
 //! # Effort Spent:
-//!  - Since the midterm report, we were able to extend our framework without any major structural changes
-//!  - Therefore we were able to spend most of our effort on implementing new features
-//!  - We implemented everything listed in the work distribution
-//!  - Significant effort was spend debugging and testing our multithreaded code across multiple nodes,
-//!  ensuring the correct functionality of routing and stabilization
-//!  - We developed our own stabilization approach that is able to efficiently handle churn
-//!  - We implemented a proof-of-work system and the ability to handle crashing / non-maliciously misbehaving nodes
-//!  - We have also put significant effort into the correct and full documentation and of our codebase
+//! - Since the midterm report, we were able to extend our framework without any major structural changes
+//! - Therefore we were able to spend most of our effort on implementing new features
+//! - We implemented everything listed in the work distribution
+//! - Significant effort was spend debugging and testing our multithreaded code across multiple nodes,
+//! ensuring the correct functionality of routing and stabilization
+//! - We developed our own stabilization approach that is able to efficiently handle churn
+//! - We implemented a proof-of-work system and the ability to handle crashing / non-maliciously misbehaving nodes
+//! - We have also put significant effort into the correct and full documentation and of our codebase
 
 use std::cmp::Ordering;
 use std::collections::hash_map::DefaultHasher;
