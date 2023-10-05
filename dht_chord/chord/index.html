@@ -1,0 +1,154 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Implementation of a distributed hash table based on Chord"><title>dht_chord::chord - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="dht_chord" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (2bbb61989 2023-10-04)" data-channel="nightly" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../../dht_chord/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../../dht_chord/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Module chord</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">dht_chord</a>::<wbr><a class="mod" href="#">chord</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/dht_chord/chord.rs.html#1-1328">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Implementation of a distributed hash table based on <a href="https://en.wikipedia.org/wiki/Chord_(peer-to-peer)">Chord</a></p>
+<p>It can operate independently from the API module and is usable as a stand-alone crate.</p>
+<h2 id="features"><a href="#features">Features:</a></h2>
+<ul>
+<li>Key-Value storage</li>
+<li>Distributed, if more than one node available (but fully functional with one node only)</li>
+<li>Built-in replication</li>
+<li>IPv4 and IPv6 support</li>
+<li>Automatic node discovery</li>
+<li>Stabilization if nodes leave or join</li>
+<li>Housekeeping thread, to remove expired entries and refresh keys we have been tasked to store</li>
+<li>Completely asynchronous and multi-threaded</li>
+<li>Requests from the API and from other nodes are processed and answered concurrently</li>
+<li>Free of race conditions due to Rusts ownership model</li>
+<li>Performance optimized implementation, capable of establishing a fully connected network with 2000
+nodes running on a single machine in under 10 seconds (without proof-of-work enabled)</li>
+</ul>
+<h2 id="architecture"><a href="#architecture">Architecture:</a></h2>
+<ul>
+<li>Our architecture separates the Chord module from the API communication</li>
+<li>The API only makes the features of the Chord module accessible via network communication</li>
+</ul>
+<h4 id="threading"><a href="#threading">Threading:</a></h4>
+<ul>
+<li>We make heavy use of multithreading/processing:
+<ul>
+<li><a href="https://docs.rs/tokio/latest/tokio/">Tokio</a> (green) threads for all asynchronous workloads</li>
+<li>Every connecting API and P2P client gets its own thread</li>
+<li>Housekeeping is performed in a background thread without blocking other operations</li>
+</ul>
+</li>
+</ul>
+<h4 id="peer-to-peer-communication"><a href="#peer-to-peer-communication">Peer-to-peer communication:</a></h4>
+<ul>
+<li>We are using <a href="https://crates.io/crates/channels">channels</a> for inter-node communication
+<ul>
+<li>This allows us to serialize/deserialize entire structs
+typesafe and integrity checked</li>
+<li>Protocol details are specified in the <a href="peer_messages/index.html" title="mod dht_chord::chord::peer_messages"><code>peer_messages</code></a> module</li>
+<li>Inter-node messages are specified in <a href="peer_messages/enum.PeerMessage.html" title="enum dht_chord::chord::peer_messages::PeerMessage"><code>PeerMessage</code></a></li>
+</ul>
+</li>
+<li>Nodes exiting unexpectedly or sending invalid messages do not crash other nodes
+<ul>
+<li>Errors are detected (and logged if desired) and the connection to the misbehaving node is closed</li>
+<li>Non-responding nodes are detected by the housekeeping thread and removed from the overlay</li>
+</ul>
+</li>
+<li>This gives us robustness against non-byzantine faults</li>
+<li>Nodes that <em>appear</em> to perform correctly, yet send well-formed but disruptive messages can not be detected</li>
+</ul>
+<h2 id="security-features"><a href="#security-features">Security features:</a></h2>
+<ul>
+<li><a href="https://docs.rs/sha3/0.10.8/sha3/">SHA-3-512</a> proof of work challenges with adjustable difficulty for requests
+<ul>
+<li>Does not prevent <a href="https://en.wikipedia.org/wiki/Byzantine_fault">byzantine</a> nodes from splitting the network or eclipsing nodes,
+but prevents greedy nodes from abusing the storage system</li>
+<li>Difficulty is independently adjustable for each request type</li>
+<li>Currently we maintain two difficulty settings,
+one for get requests and one for (potentially disruptive) write/storage requests</li>
+</ul>
+</li>
+<li>Addresses of nodes assigned based on hash of IP + port
+<ul>
+<li>This could be easily adjusted to only hash IPs,
+providing limited <a href="https://en.wikipedia.org/wiki/Sybil_attack">sybil defense</a></li>
+<li>In case of IPv6, we could only hash a masked version of the IP</li>
+<li>We have currently not implemented this,
+as it would interfere with development and testing</li>
+</ul>
+</li>
+<li>Limited defence against nodes refusing to store values or disconnecting
+<ul>
+<li>Our housekeeping thread continuously refreshes values that have been stored in the DHT upon our own request</li>
+</ul>
+</li>
+</ul>
+<h2 id="security-discussion"><a href="#security-discussion">Security discussion:</a></h2>
+<ul>
+<li>Byzantine fault tolerance is extremely difficult to achieve in a distributed system</li>
+<li>We initially tried to implement a byzantine fault tolerance according to <a href="https://www.cs.unm.edu/~treport/tr/05-04/chord.pdf">this paper</a>,
+but came to the conclusion that it was not feasible to implement in a reasonable time frame</li>
+<li>Byzantine fault tolerance would require multiple complex submodules to be implemented, such as
+<ul>
+<li>Secure multiparty computation</li>
+<li>Secure network size estimation</li>
+<li>A split of the overlay network into multiple swarms</li>
+</ul>
+</li>
+<li>We were not able to find a sufficiently advanced crate for secure multiparty computation
+and a (byzantine fault tolerant) network size estimation would carry the workload of an entire additional module</li>
+<li>This is why we ultimately decided to only implement proof-of-work as a defence against greedy nodes</li>
+<li>We understand that our system <strong>can not defend</strong> against a malicious attacker deliberately providing nodes with false information</li>
+<li>Implementing such a system would not only be extremely difficult,
+but also extremely resource intensive and inefficient,
+as a significant amount of nodes would need to reach consensus on every single request</li>
+<li>We do however note, that a few of our design choices should make attacks more difficult:
+<ul>
+<li>Choosing IDs based on their IP address makes it harder for nodes to choose their position in the network</li>
+<li>This makes it more difficult to eclipse nodes</li>
+<li>The finger table also offers some resistance against eclipse attacks:
+<ul>
+<li>Nodes regularly check in with all their fingers, which makes it difficult to eclipse them fully</li>
+</ul>
+</li>
+<li>To prevent race conditions, there are checks if overlay changes like <code>SetPredecessor</code> are valid,
+or if there are other nodes between the current node and the new predecessor
+<ul>
+<li>This makes it more difficult for an attacker to split the network or eclipse nodes,
+as nodes will not accept an incorrectly placed node any new node as their predecessor</li>
+</ul>
+</li>
+<li>Our stabilization method regularly checks the health of peers in the neighborhood and fixes the overlay if necessary
+<ul>
+<li>An attacker needs to operate their peers continuously, as they would otherwise be removed</li>
+</ul>
+</li>
+<li>Overwriting values is possible, but expensive due to proof-of-work</li>
+<li>DoS Attacks, such as content pollution and index poisoning,
+are hardened against by increased proof-of-work difficulty for write requests</li>
+</ul>
+</li>
+</ul>
+<h2 id="future-work"><a href="#future-work">Future Work:</a></h2>
+<p>We have some ideas/suggestions on how to further improve our implementation:</p>
+<h3 id="improved-sybil-defence"><a href="#improved-sybil-defence">Improved sybil defence:</a></h3>
+<ul>
+<li>Currently we hash the IP and port of a node to determine its ID
+<ul>
+<li>This could be easily adjusted to only hash IPs,
+making it harder to choose a specific node position for an attacker,
+as this would require them to have control over a large number of IP addresses</li>
+</ul>
+</li>
+<li>New nodes should be treated differently, i.e. not as trustworthy until they stayed some time in the network</li>
+<li>We could introduce active scanning measures to track whether nodes are truly active and responsive</li>
+</ul>
+<h3 id="misbehaviour-defence"><a href="#misbehaviour-defence">Misbehaviour defence:</a></h3>
+<ul>
+<li>The most efficient way to “cheaply” detect misbehaving nodes would probably be an out-of-band
+reporting system and/or a scanning authority that secretly scans for misbehaving nodes and blacklists them,
+similarly to how <a href="https://www.torproject.org/">The Tor Project</a> detects and blacklists misbehaving relays</li>
+<li>This would however, go <em>against</em> the decentralization aspect of our system</li>
+</ul>
+<h3 id="better-stabilize"><a href="#better-stabilize">Better Stabilize:</a></h3>
+<ul>
+<li>Stabilize in its current form relies on each node to individually realize that a peer has disconnected from the network</li>
+<li>This sometimes incorrectly invalidates <code>SetPredecessor</code> and <code>SetSuccessor</code> requests,
+as they are denied on the grounds that the receiving node does not yet know,
+that its current successor/predecessor no longer exists</li>
+</ul>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="peer_messages/index.html" title="mod dht_chord::chord::peer_messages">peer_messages</a></div><div class="desc docblock-short">Communication between peers</div></li></ul><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.connect_to_peer.html" title="macro dht_chord::chord::connect_to_peer">connect_to_peer</a><span title="Restricted Visibility">&nbsp;🔒</span> </div></li></ul><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.Chord.html" title="struct dht_chord::chord::Chord">Chord</a></div><div class="desc docblock-short">Distributed Hash Table</div></li><li><div class="item-name"><a class="struct" href="struct.ChordState.html" title="struct dht_chord::chord::ChordState">ChordState</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="desc docblock-short">All data necessary for DHT operation</div></li></ul><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.calculate_hash.html" title="fn dht_chord::chord::calculate_hash">calculate_hash</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="desc docblock-short">Calculate hash for ID-mapping</div></li><li><div class="item-name"><a class="fn" href="fn.is_between_on_ring.html" title="fn dht_chord::chord::is_between_on_ring">is_between_on_ring</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="desc docblock-short">Check if a key is between two keys/nodes on the ring</div></li><li><div class="item-name"><a class="fn" href="fn.require_proof_of_work.html" title="fn dht_chord::chord::require_proof_of_work">require_proof_of_work</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="desc docblock-short">Sends a <a href="peer_messages/struct.ProofOfWorkChallenge.html" title="struct dht_chord::chord::peer_messages::ProofOfWorkChallenge"><code>ProofOfWorkChallenge</code></a> to the connected peer
+and waits for the corresponding <a href="peer_messages/struct.ProofOfWorkResponse.html" title="struct dht_chord::chord::peer_messages::ProofOfWorkResponse"><code>peer_messages::ProofOfWorkResponse</code></a>.</div></li><li><div class="item-name"><a class="fn" href="fn.solve_proof_of_work.html" title="fn dht_chord::chord::solve_proof_of_work">solve_proof_of_work</a><span title="Restricted Visibility">&nbsp;🔒</span> </div><div class="desc docblock-short">Solves a <a href="peer_messages/struct.ProofOfWorkChallenge.html" title="struct dht_chord::chord::peer_messages::ProofOfWorkChallenge"><code>ProofOfWorkChallenge</code></a>
+and sends the corresponding <a href="peer_messages/struct.ProofOfWorkResponse.html" title="struct dht_chord::chord::peer_messages::ProofOfWorkResponse"><code>peer_messages::ProofOfWorkResponse</code></a>.</div></li></ul></section></div></main></body></html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Documentation for the project."><title>dht_chord - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dht_chord" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (2bbb61989 2023-10-04)" data-channel="nightly" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../dht_chord/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../dht_chord/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate dht_chord</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 1.0.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">dht_chord</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/dht_chord/lib.rs.html#1-75">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Documentation for the project.</p>
+<h2 id="architecture"><a href="#architecture">Architecture:</a></h2>
+<p>All you need to build our package is the latest (nightly) version of the Rust compiler and Cargo.</p>
+<p>Installation instructions for Rust are provided <a href="https://www.rust-lang.org/tools/install">here</a>.</p>
+<p>For reference, we are currently working with the following versions:</p>
+<ul>
+<li><code>cargo 1.74.0-nightly (96fe1c9e1 2023-08-29)</code></li>
+<li><code>rustc 1.74.0-nightly (35e416303 2023-09-01)</code></li>
+</ul>
+<p><a href="https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/jobs/artifacts/master/file/target/doc/p2p_dht/index.html?job=documentation">This documentation</a> was built with:</p>
+<ul>
+<li><code>rustdoc 1.74.0-nightly (35e416303 2023-09-01)</code></li>
+</ul>
+<h2 id="main-executable"><a href="#main-executable">Main executable:</a></h2>
+<p>The main executable of this program <code>p2p_dht</code> takes one command line argument, <code>-c &lt;config&gt;</code>,
+where <code>&lt;config&gt;</code> is the path to a configuration file.</p>
+<p>The configuration file is expected to be in the INI format. The following configuration options are available:</p>
+<div class="example-wrap"><pre class="language-ini"><code>[dht]
+default_store_duration = 60     ; Default storage duration in seconds
+max_store_duration = 600        ; Maximum storage duration in seconds
+p2p_address = 127.0.0.1:8001    ; Address to listen on for P2P connections
+api_address = 127.0.0.1:7401    ; Address to listen on for API connections
+bootstrap_node = 127.0.0.1:8000 ; (Optional) Address of a bootstrap node
+</code></pre></div>
+<p>To run our program, you may use:</p>
+<div class="example-wrap"><pre class="language-bash"><code>cargo run --release -- -c example_config_node_0.ini
+</code></pre></div>
+<p>We support different levels of logging, with the default being <code>info</code>.
+You can change the log level by setting the <code>RUST_LOG</code> environment variable to one of the following values:</p>
+<ul>
+<li><code>error</code></li>
+<li><code>warn</code></li>
+<li><code>info</code></li>
+<li><code>debug</code></li>
+<li><code>trace</code></li>
+</ul>
+<p>The latest <code>x86_64-unknown-linux-gnu</code> binary of our program is provided as an artifact on our <a href="https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/jobs/artifacts/master/file/target/release/p2p_dht?job=build">GitLab repository</a>.</p>
+<p>Alternatively, you may choose to build our program yourself:</p>
+<h3 id="compilation"><a href="#compilation">Compilation:</a></h3>
+<p>After cloning this repository, you may run the following command to build our program:</p>
+<div class="example-wrap"><pre class="language-bash"><code>cargo build --release
+</code></pre></div>
+<p>This will create a binary in <code>target/release/p2p_dht</code>.</p>
+<p>You can also build this documentation locally:</p>
+<div class="example-wrap"><pre class="language-bash"><code>cargo doc --no-deps --document-private-items
+</code></pre></div>
+<p>The documentation will be created in <code>target/doc/p2p_dht/index.html</code>.</p>
+<h3 id="testing"><a href="#testing">Testing:</a></h3>
+<p>We provide a CI/CD pipeline that runs our tests on every commit.
+You may find the latest results <a href="https://gitlab.lrz.de/netintum/teaching/p2psec_projects_2023/DHT-2/-/pipelines/latest">here</a>.</p>
+<p>Alternatively, you can run our test suit yourself:</p>
+<div class="example-wrap"><pre class="language-bash"><code>cargo test --release
+</code></pre></div><h2 id="how-to-read-this-documentation"><a href="#how-to-read-this-documentation">How to read this documentation:</a></h2>
+<p>Our documentation follows a “docs as code” approach,
+and is generated directly out of our source code.
+Whenever you see a module, struct or function or any other clickable link in this documentation,
+you can use it to directly jump to description and explanation of the corresponding code.</p>
+<p>Below, you will find links to the modules of this crate:</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="api_communication/index.html" title="mod dht_chord::api_communication">api_communication</a></div><div class="desc docblock-short">Provides a server socket for API communication</div></li><li><div class="item-name"><a class="mod" href="chord/index.html" title="mod dht_chord::chord">chord</a></div><div class="desc docblock-short">Implementation of a distributed hash table based on <a href="https://en.wikipedia.org/wiki/Chord_(peer-to-peer)">Chord</a></div></li></ul></section></div></main></body></html>
